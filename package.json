@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@heroui/react": "^2.8.2",
+    "@xyflow/react": "^12.8.3",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "lodash-es": "^4.17.21",
