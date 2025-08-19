@@ -30,6 +30,14 @@ export function Home() {
               rect
             </Link>
           </li>
+          <li>
+            <Link
+              to="/node/ellipse"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              ellipse
+            </Link>
+          </li>
         </ul>
       </li>
     </ul>
