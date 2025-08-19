@@ -22,6 +22,14 @@ export function Home() {
               type
             </Link>
           </li>
+          <li>
+            <Link
+              to="/node/rect"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              rect
+            </Link>
+          </li>
         </ul>
       </li>
     </ul>

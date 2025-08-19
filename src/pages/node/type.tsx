@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback } from 'react'
 import {
   ReactFlow,
   MiniMap,
@@ -11,9 +11,8 @@ import {
   type Connection,
   type Edge,
   type Node,
-} from '@xyflow/react';
-
-import '@xyflow/react/dist/style.css';
+  type ReactFlowInstance,
+} from '@xyflow/react'
 
 // 初始节点数据
 const initialNodes: Node[] = [
@@ -107,7 +106,7 @@ const initialNodes: Node[] = [
       borderRadius: '8px',
     },
   },
-];
+]
 
 // 初始边数据
 const initialEdges: Edge[] = [
@@ -146,47 +145,51 @@ const initialEdges: Edge[] = [
     animated: true,
     style: { stroke: '#7c3aed' },
   },
-];
+]
 
 export default function NodeTypeTest() {
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, , onNodesChange] = useNodesState(initialNodes)
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges)
 
   const onConnect = useCallback(
     (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
-  );
+  )
+
+  const onInit = useCallback((instance: ReactFlowInstance) => {
+    console.log(instance)
+  }, [])
 
   return (
-    <div className="w-full h-screen">
-      <div className="p-4 bg-gray-100 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
+    <div className="flex flex-col h-screen w-full">
+      <div className="border-b border-gray-200 bg-gray-100 p-4">
+        <h1 className="mb-2 text-2xl font-bold text-gray-800">
           XY Flow React - Node Types Test
         </h1>
         <p className="text-gray-600">
           这个示例展示了 XY Flow React 的四种内置节点类型：
         </p>
-        <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div className="mt-2 grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-blue-400 rounded mr-2"></div>
+            <div className="mr-2 h-4 w-4 rounded bg-blue-400"></div>
             <span>Input Node - 输入节点</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-yellow-400 rounded mr-2"></div>
+            <div className="mr-2 h-4 w-4 rounded bg-yellow-400"></div>
             <span>Default Node - 默认节点</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-green-400 rounded mr-2"></div>
+            <div className="mr-2 h-4 w-4 rounded bg-green-400"></div>
             <span>Output Node - 输出节点</span>
           </div>
           <div className="flex items-center">
-            <div className="w-4 h-4 bg-purple-400 rounded mr-2"></div>
+            <div className="mr-2 h-4 w-4 rounded bg-purple-400"></div>
             <span>Group Node - 分组节点</span>
           </div>
         </div>
       </div>
 
-      <div className="w-full h-full">
+      <div className="h-full w-full flex-1">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -195,6 +198,10 @@ export default function NodeTypeTest() {
           onConnect={onConnect}
           fitView
           style={{ background: '#f8fafc' }}
+          proOptions={{
+            hideAttribution: true,
+          }}
+          onInit={onInit}
         >
           <Controls />
           <MiniMap />
@@ -202,5 +209,5 @@ export default function NodeTypeTest() {
         </ReactFlow>
       </div>
     </div>
-  );
+  )
 }
