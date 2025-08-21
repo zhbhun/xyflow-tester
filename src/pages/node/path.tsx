@@ -84,9 +84,7 @@ export function PathNode({
         <div className="flex flex-col gap-2">
           {/* 画笔颜色 */}
           <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-2 shadow-lg">
-            <div className="mr-2 text-xs font-medium text-gray-500">
-              Color:
-            </div>
+            <div className="mr-2 text-xs font-medium text-gray-500">Color:</div>
             {colorOptions.map((colorOption) => (
               <button
                 key={colorOption}
@@ -124,16 +122,16 @@ export function PathNode({
       </NodeToolbar>
       <div className="h-full w-full">
         <svg
+          className="pointer-events-none overflow-visible"
           width="100%"
           height="100%"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
-          className="pointer-events-none"
         >
           <path
             d={path}
             stroke={color}
-            strokeWidth={strokeWidth / 10}
+            strokeWidth={strokeWidth}
             fill="none"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -181,13 +179,14 @@ export function PathTool() {
     const lastPoint = pathRef.current[pathRef.current.length - 1]
     if (lastPoint) {
       const distance = Math.sqrt(
-        Math.pow(flowPosition.x - lastPoint.x, 2) + Math.pow(flowPosition.y - lastPoint.y, 2)
+        Math.pow(flowPosition.x - lastPoint.x, 2) +
+          Math.pow(flowPosition.y - lastPoint.y, 2),
       )
       if (distance < 2) return // 最小距离阈值
     }
 
     pathRef.current = [...pathRef.current, flowPosition]
-    setCurrentScreenPath(prev => [...prev, screenPosition])
+    setCurrentScreenPath((prev) => [...prev, screenPosition])
   }
 
   function handlePointerUp(e: PointerEvent) {
@@ -202,10 +201,10 @@ export function PathTool() {
     }
 
     // 计算路径的边界框
-    const minX = Math.min(...pathRef.current.map(p => p.x))
-    const maxX = Math.max(...pathRef.current.map(p => p.x))
-    const minY = Math.min(...pathRef.current.map(p => p.y))
-    const maxY = Math.max(...pathRef.current.map(p => p.y))
+    const minX = Math.min(...pathRef.current.map((p) => p.x))
+    const maxX = Math.max(...pathRef.current.map((p) => p.x))
+    const minY = Math.min(...pathRef.current.map((p) => p.y))
+    const maxY = Math.max(...pathRef.current.map((p) => p.y))
 
     const width = maxX - minX
     const height = maxY - minY
@@ -219,7 +218,7 @@ export function PathTool() {
     }
 
     // 将路径坐标转换为相对于边界框的坐标，并归一化到 0-100 范围
-    const normalizedPath = pathRef.current.map(point => ({
+    const normalizedPath = pathRef.current.map((point) => ({
       x: ((point.x - minX) / width) * 100,
       y: ((point.y - minY) / height) * 100,
     }))
@@ -275,7 +274,10 @@ export function PathTool() {
         onPointerUp={handlePointerUp}
       />
       {isDrawing && currentScreenPath.length > 1 && (
-        <svg className="pointer-events-none absolute inset-0 z-[6]" style={{ width: '100vw', height: '100vh' }}>
+        <svg
+          className="pointer-events-none absolute inset-0 z-[6]"
+          style={{ width: '100vw', height: '100vh' }}
+        >
           <path
             d={getScreenPath()}
             fill="none"
@@ -284,29 +286,28 @@ export function PathTool() {
             strokeLinecap="round"
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
-            opacity="0.7"
           />
         </svg>
       )}
 
       {/* 画笔设置面板 */}
       <Panel position="top-right">
-        <div className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-lg min-w-[240px]">
-          <div className="text-sm font-medium text-gray-700 mb-1">
+        <div className="flex min-w-[240px] flex-col gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-lg">
+          <div className="mb-1 text-sm font-medium text-gray-700">
             🎨 Brush Settings
           </div>
 
           {/* 画笔颜色 */}
           <div className="flex flex-col gap-2">
             <div className="text-xs font-medium text-gray-500">Color:</div>
-            <div className="flex items-center gap-1 flex-wrap">
+            <div className="flex flex-wrap items-center gap-1">
               {colorOptions.map((colorOption) => (
                 <button
                   key={colorOption}
                   onClick={() => setCurrentColor(colorOption)}
                   className={`h-8 w-8 cursor-pointer rounded-full transition-all hover:scale-110 ${
                     currentColor === colorOption
-                      ? 'ring-2 ring-blue-500 ring-offset-2 shadow-md'
+                      ? 'shadow-md ring-2 ring-blue-500 ring-offset-2'
                       : 'border-2 border-gray-200 hover:border-gray-300'
                   }`}
                   style={{ backgroundColor: colorOption }}
@@ -321,15 +322,15 @@ export function PathTool() {
             <div className="text-xs font-medium text-gray-500">
               Width: {currentStrokeWidth}px
             </div>
-            <div className="flex items-center gap-1 flex-wrap">
+            <div className="flex flex-wrap items-center gap-1">
               {strokeWidthOptions.slice(0, 8).map((widthOption) => (
                 <button
                   key={widthOption}
                   onClick={() => setCurrentStrokeWidth(widthOption)}
-                  className={`cursor-pointer rounded border px-3 py-1 text-xs font-medium transition-colors min-w-[32px] ${
+                  className={`min-w-[32px] cursor-pointer rounded border px-3 py-1 text-xs font-medium transition-colors ${
                     currentStrokeWidth === widthOption
                       ? 'border-blue-600 bg-blue-600 text-white shadow-md'
-                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                   title={`Set brush width to ${widthOption}px`}
                 >
@@ -337,15 +338,15 @@ export function PathTool() {
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-1 flex-wrap">
+            <div className="flex flex-wrap items-center gap-1">
               {strokeWidthOptions.slice(8).map((widthOption) => (
                 <button
                   key={widthOption}
                   onClick={() => setCurrentStrokeWidth(widthOption)}
-                  className={`cursor-pointer rounded border px-3 py-1 text-xs font-medium transition-colors min-w-[32px] ${
+                  className={`min-w-[32px] cursor-pointer rounded border px-3 py-1 text-xs font-medium transition-colors ${
                     currentStrokeWidth === widthOption
                       ? 'border-blue-600 bg-blue-600 text-white shadow-md'
-                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                   title={`Set brush width to ${widthOption}px`}
                 >
@@ -356,9 +357,9 @@ export function PathTool() {
           </div>
 
           {/* 当前预览 */}
-          <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
+          <div className="flex flex-col gap-2 border-t border-gray-100 pt-2">
             <div className="text-xs font-medium text-gray-500">Preview:</div>
-            <div className="flex items-center justify-center bg-gray-50 rounded p-3">
+            <div className="flex items-center justify-center rounded bg-gray-50 p-3">
               <svg width="80" height="20">
                 <path
                   d="M 10 10 L 70 10"
@@ -458,14 +459,15 @@ export default function PathFlow() {
         </Panel>
 
         <Panel position="bottom-right">
-          <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg max-w-[200px]">
-            <div className="text-sm font-medium text-gray-700 mb-2">
+          <div className="max-w-[200px] rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+            <div className="mb-2 text-sm font-medium text-gray-700">
               💡 Tips
             </div>
             <div className="text-xs text-gray-500">
-              • Click and drag to draw paths<br/>
-              • Adjust brush settings above<br/>
-              • Switch to Selection Mode to edit nodes
+              • Click and drag to draw paths
+              <br />
+              • Adjust brush settings above
+              <br />• Switch to Selection Mode to edit nodes
             </div>
           </div>
         </Panel>
