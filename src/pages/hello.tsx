@@ -34,6 +34,9 @@ function Hello() {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onViewportChange={(viewport) => {
+          console.log('>>', viewport)
+        }}
       >
         <MiniMap />
         <Controls />

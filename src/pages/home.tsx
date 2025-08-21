@@ -38,6 +38,22 @@ export function Home() {
               ellipse
             </Link>
           </li>
+          <li>
+            <Link
+              to="/node/path"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              path
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/node/text"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              text
+            </Link>
+          </li>
         </ul>
       </li>
     </ul>
