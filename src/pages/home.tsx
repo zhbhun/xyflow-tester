@@ -12,6 +12,35 @@ export function Home() {
         </Link>
       </li>
       <li>
+        Background
+        <ul className="list-inside list-disc space-y-2 py-2 pl-4">
+          <li>
+            <Link
+              to="/background/cross"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              cross
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/background/dots"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              dots
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/background/lines"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              lines
+            </Link>
+          </li>
+        </ul>
+      </li>
+      <li>
         Node
         <ul className="list-inside list-disc space-y-2 py-2 pl-4">
           <li>
