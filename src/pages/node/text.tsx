@@ -106,6 +106,7 @@ export function TextNode({
   const [editText, setEditText] = useState(text)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [multipleNodesSelected, setMultipleNodesSelected] = useState(false)
+  const justEnteredEditingRef = useRef(false)
 
   const onSelectionChange = useCallback(
     ({ nodes }: { nodes: Node[] }) => {
@@ -122,6 +123,7 @@ export function TextNode({
 
   // 双击进入编辑模式
   const handleDoubleClick = useCallback(() => {
+    justEnteredEditingRef.current = true
     setIsEditing(true)
     setEditText(text)
   }, [text])
@@ -130,12 +132,14 @@ export function TextNode({
   const saveEdit = useCallback(() => {
     updateNodeData(id, { text: editText })
     setIsEditing(false)
+    justEnteredEditingRef.current = false
   }, [id, editText, updateNodeData])
 
   // 取消编辑
   const cancelEdit = useCallback(() => {
     setEditText(text)
     setIsEditing(false)
+    justEnteredEditingRef.current = false
   }, [text])
 
   // 处理键盘事件
@@ -194,23 +198,23 @@ export function TextNode({
     }
   }, [editText, fontSize, fontWeight])
 
-  // 自动聚焦到编辑框并调整尺寸
+  // 自动聚焦到编辑框并选中文字（仅在刚进入编辑模式时）
+  useEffect(() => {
+    if (isEditing && textareaRef.current && justEnteredEditingRef.current) {
+      textareaRef.current.focus()
+      // 默认选中所有文字，便于用户快速替换
+      textareaRef.current.select()
+      justEnteredEditingRef.current = false
+    }
+  }, [isEditing])
+
+  // 调整textarea尺寸
   useEffect(() => {
     if (isEditing && textareaRef.current) {
-      textareaRef.current.focus()
-      textareaRef.current.select()
       adjustTextareaHeight()
       adjustTextareaWidth()
     }
-  }, [isEditing, adjustTextareaHeight, adjustTextareaWidth])
-
-  // 当文本内容变化时调整尺寸
-  useEffect(() => {
-    if (isEditing) {
-      adjustTextareaHeight()
-      adjustTextareaWidth()
-    }
-  }, [editText, isEditing, adjustTextareaHeight, adjustTextareaWidth])
+  }, [isEditing, editText, adjustTextareaHeight, adjustTextareaWidth])
 
   // 处理工具栏选项变更
   const handleFontSizeChange = (newFontSize: number) => {
@@ -401,7 +405,7 @@ export function TextNode({
       </NodeToolbar>
 
       <div
-        className="nodrag nopan cursor-text"
+        className={`nodrag nopan ${isEditing ? 'cursor-text' : 'cursor-pointer'}`}
         style={getTextStyles()}
         onDoubleClick={handleDoubleClick}
       >
@@ -409,13 +413,23 @@ export function TextNode({
           <textarea
             ref={textareaRef}
             value={editText}
-            onChange={(e) => {
+                        onChange={(e) => {
               setEditText(e.target.value)
-              // 输入时实时调整尺寸
-              setTimeout(() => {
-                adjustTextareaHeight()
-                adjustTextareaWidth()
-              }, 0)
+            }}
+            onInput={() => {
+              // 调整高度时保存和恢复光标位置
+              if (textareaRef.current) {
+                // 保存光标位置
+                const selectionStart = textareaRef.current.selectionStart
+                const selectionEnd = textareaRef.current.selectionEnd
+
+                // 调整高度
+                textareaRef.current.style.height = 'auto'
+                textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+
+                // 恢复光标位置
+                textareaRef.current.setSelectionRange(selectionStart, selectionEnd)
+              }
             }}
             onKeyDown={handleKeyDown}
             onBlur={saveEdit}
