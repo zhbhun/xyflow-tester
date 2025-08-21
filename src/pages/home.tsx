@@ -12,6 +12,14 @@ export function Home() {
         </Link>
       </li>
       <li>
+        <Link
+          to="/controls"
+          className="text-blue-600 underline hover:text-blue-800"
+        >
+          controls
+        </Link>
+      </li>
+      <li>
         Background
         <ul className="list-inside list-disc space-y-2 py-2 pl-4">
           <li>
