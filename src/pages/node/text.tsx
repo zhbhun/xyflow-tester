@@ -1,4 +1,10 @@
-import { useCallback, useState, useRef, useEffect, type PointerEvent } from 'react'
+import {
+  useCallback,
+  useState,
+  useRef,
+  useEffect,
+  type PointerEvent,
+} from 'react'
 import {
   ReactFlow,
   useNodesState,
@@ -16,6 +22,7 @@ import {
   type Connection,
   type Edge,
 } from '@xyflow/react'
+import { defaultTextStyle, measureTextWidth } from './textUtils'
 
 // ===== TextNode 组件 =====
 export type TextNodeType = Node<
@@ -38,7 +45,10 @@ const fontWeightOptions: { value: 'normal' | 'bold'; label: string }[] = [
   { value: 'bold', label: 'Bold' },
 ]
 
-const textAlignOptions: { value: 'left' | 'center' | 'right'; label: string }[] = [
+const textAlignOptions: {
+  value: 'left' | 'center' | 'right'
+  label: string
+}[] = [
   { value: 'left', label: 'Left' },
   { value: 'center', label: 'Center' },
   { value: 'right', label: 'Right' },
@@ -98,7 +108,7 @@ export function TextNode({
     backgroundColor,
     borderColor,
     borderWidth,
-    textAlign
+    textAlign,
   },
 }: NodeProps<TextNodeType>) {
   const { updateNodeData } = useReactFlow()
@@ -172,29 +182,11 @@ export function TextNode({
   const adjustTextareaWidth = useCallback(() => {
     if (textareaRef.current) {
       const textToMeasure = editText || '双击编辑文本'
-      const lines = textToMeasure.split('\n')
-
-      // 创建一个临时的测量元素
-      const measureElement = document.createElement('span')
-      measureElement.style.visibility = 'hidden'
-      measureElement.style.position = 'absolute'
-      measureElement.style.fontSize = `${fontSize}px`
-      measureElement.style.fontWeight = fontWeight
-      measureElement.style.fontFamily = 'inherit'
-      measureElement.style.whiteSpace = 'pre'
-
-      document.body.appendChild(measureElement)
-
-      // 找到最宽的行
-      let maxWidth = 20 // 最小宽度
-      lines.forEach(line => {
-        measureElement.textContent = line || ' ' // 空行用空格占位
-        maxWidth = Math.max(maxWidth, measureElement.offsetWidth)
+      const width = measureTextWidth(textToMeasure, {
+        fontSize,
+        fontWeight,
       })
-
-      document.body.removeChild(measureElement)
-
-      textareaRef.current.style.width = `${maxWidth + 8}px` // 加8px容错
+      textareaRef.current.style.width = `${width}px`
     }
   }, [editText, fontSize, fontWeight])
 
@@ -251,8 +243,12 @@ export function TextNode({
       fontSize: `${fontSize}px`,
       fontWeight,
       color,
-      backgroundColor: backgroundColor === 'transparent' ? 'transparent' : backgroundColor,
-      border: borderWidth > 0 && borderColor !== 'transparent' ? `${borderWidth}px solid ${borderColor}` : 'none',
+      backgroundColor:
+        backgroundColor === 'transparent' ? 'transparent' : backgroundColor,
+      border:
+        borderWidth > 0 && borderColor !== 'transparent'
+          ? `${borderWidth}px solid ${borderColor}`
+          : 'none',
       textAlign,
       borderRadius: '4px',
       minWidth: '20px',
@@ -267,7 +263,9 @@ export function TextNode({
     <>
       <NodeResizer isVisible={selected && !dragging && !isEditing} />
       <NodeToolbar
-        isVisible={selected && !dragging && !multipleNodesSelected && !isEditing}
+        isVisible={
+          selected && !dragging && !multipleNodesSelected && !isEditing
+        }
         className="nopan"
       >
         <div className="flex flex-col gap-2">
@@ -277,7 +275,7 @@ export function TextNode({
             <select
               value={fontSize}
               onChange={(e) => handleFontSizeChange(Number(e.target.value))}
-              className="text-xs border border-gray-200 rounded px-2 py-1"
+              className="rounded border border-gray-200 px-2 py-1 text-xs"
             >
               {fontSizeOptions.map((size) => (
                 <option key={size} value={size}>
@@ -340,7 +338,9 @@ export function TextNode({
 
           {/* 背景颜色 */}
           <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-2 shadow-lg">
-            <div className="mr-2 text-xs font-medium text-gray-500">Background:</div>
+            <div className="mr-2 text-xs font-medium text-gray-500">
+              Background:
+            </div>
             {backgroundColorOptions.map((bgOption) => (
               <button
                 key={bgOption}
@@ -351,10 +351,18 @@ export function TextNode({
                     : 'border border-gray-200'
                 }`}
                 style={{
-                  backgroundColor: bgOption === 'transparent' ? 'transparent' : bgOption,
-                  backgroundImage: bgOption === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none',
-                  backgroundSize: bgOption === 'transparent' ? '8px 8px' : 'auto',
-                  backgroundPosition: bgOption === 'transparent' ? '0 0, 0 4px, 4px -4px, -4px 0px' : 'auto'
+                  backgroundColor:
+                    bgOption === 'transparent' ? 'transparent' : bgOption,
+                  backgroundImage:
+                    bgOption === 'transparent'
+                      ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)'
+                      : 'none',
+                  backgroundSize:
+                    bgOption === 'transparent' ? '8px 8px' : 'auto',
+                  backgroundPosition:
+                    bgOption === 'transparent'
+                      ? '0 0, 0 4px, 4px -4px, -4px 0px'
+                      : 'auto',
                 }}
                 title={`Set background color to ${bgOption}`}
               />
@@ -363,7 +371,9 @@ export function TextNode({
 
           {/* 边框 */}
           <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white p-2 shadow-lg">
-            <div className="mr-2 text-xs font-medium text-gray-500">Border:</div>
+            <div className="mr-2 text-xs font-medium text-gray-500">
+              Border:
+            </div>
             {borderColorOptions.slice(0, 5).map((borderOption) => (
               <button
                 key={borderOption}
@@ -374,10 +384,20 @@ export function TextNode({
                     : 'border border-gray-200'
                 }`}
                 style={{
-                  backgroundColor: borderOption === 'transparent' ? 'transparent' : borderOption,
-                  backgroundImage: borderOption === 'transparent' ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 'none',
-                  backgroundSize: borderOption === 'transparent' ? '8px 8px' : 'auto',
-                  backgroundPosition: borderOption === 'transparent' ? '0 0, 0 4px, 4px -4px, -4px 0px' : 'auto'
+                  backgroundColor:
+                    borderOption === 'transparent'
+                      ? 'transparent'
+                      : borderOption,
+                  backgroundImage:
+                    borderOption === 'transparent'
+                      ? 'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)'
+                      : 'none',
+                  backgroundSize:
+                    borderOption === 'transparent' ? '8px 8px' : 'auto',
+                  backgroundPosition:
+                    borderOption === 'transparent'
+                      ? '0 0, 0 4px, 4px -4px, -4px 0px'
+                      : 'auto',
                 }}
                 title={`Set border color to ${borderOption}`}
               />
@@ -405,7 +425,7 @@ export function TextNode({
       </NodeToolbar>
 
       <div
-        className={`nodrag nopan ${isEditing ? 'cursor-text' : 'cursor-pointer'}`}
+        className={`${isEditing ? 'nodrag nopan cursor-text' : ''}`}
         style={getTextStyles()}
         onDoubleClick={handleDoubleClick}
       >
@@ -413,38 +433,18 @@ export function TextNode({
           <textarea
             ref={textareaRef}
             value={editText}
-                        onChange={(e) => {
+            onChange={(e) => {
               setEditText(e.target.value)
-            }}
-            onInput={() => {
-              // 调整高度时保存和恢复光标位置
-              if (textareaRef.current) {
-                // 保存光标位置
-                const selectionStart = textareaRef.current.selectionStart
-                const selectionEnd = textareaRef.current.selectionEnd
-
-                // 调整高度
-                textareaRef.current.style.height = 'auto'
-                textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
-
-                // 恢复光标位置
-                textareaRef.current.setSelectionRange(selectionStart, selectionEnd)
-              }
             }}
             onKeyDown={handleKeyDown}
             onBlur={saveEdit}
             style={{
-              background: 'transparent',
-              border: 'none',
-              outline: 'none',
-              resize: 'none',
+              ...defaultTextStyle,
               fontSize: `${fontSize}px`,
               fontWeight,
               color,
               textAlign,
-              fontFamily: 'inherit',
               lineHeight: '1.2',
-              overflow: 'hidden',
               minWidth: '20px',
               minHeight: '1.2em',
             }}
@@ -461,38 +461,157 @@ export function TextNode({
 // ===== TextTool 组件 =====
 export function TextTool() {
   const { screenToFlowPosition, setNodes } = useReactFlow()
+  const [isEditing, setIsEditing] = useState(false)
+  const [editText, setEditText] = useState('')
+  const [editPosition, setEditPosition] = useState({ x: 0, y: 0 })
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  // 自动调整 textarea 高度
+  const adjustTextareaHeight = useCallback(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+    }
+  }, [])
+
+  // 自动调整 textarea 宽度
+  const adjustTextareaWidth = useCallback(() => {
+    if (textareaRef.current) {
+      const textToMeasure = editText || 'A' // 使用 'A' 作为最小宽度参考
+      const width = measureTextWidth(textToMeasure)
+      textareaRef.current.style.width = `${width}px`
+    }
+  }, [editText])
+
+  // 调整textarea尺寸
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      adjustTextareaHeight()
+      adjustTextareaWidth()
+    }
+  }, [isEditing, editText, adjustTextareaHeight, adjustTextareaWidth])
+
+  // 自动聚焦
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus()
+    }
+  }, [isEditing])
+
+  // 完成编辑
+  const finishEditing = useCallback(() => {
+    if (editText.trim()) {
+      // 只有输入了内容才创建节点
+      const flowPosition = screenToFlowPosition({
+        x: editPosition.x,
+        y: editPosition.y,
+      })
+
+      setNodes((nodes) => [
+        ...nodes,
+        {
+          id: crypto.randomUUID(),
+          type: 'text',
+          position: flowPosition,
+          width: textareaRef.current?.offsetWidth,
+          height: textareaRef.current?.offsetHeight,
+          data: {
+            text: editText.trim(),
+            fontSize: 16,
+            fontWeight: 'normal' as const,
+            color: '#000000',
+            backgroundColor: 'transparent',
+            borderColor: 'transparent',
+            borderWidth: 0,
+            textAlign: 'left' as const,
+          },
+        },
+      ])
+    }
+
+    setIsEditing(false)
+    setEditText('')
+  }, [editText, editPosition, screenToFlowPosition, setNodes])
+
+  // 取消编辑
+  const cancelEditing = useCallback(() => {
+    setIsEditing(false)
+    setEditText('')
+  }, [])
+
+  // 处理键盘事件
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        // Ctrl+Enter 完成编辑
+        e.preventDefault()
+        finishEditing()
+      } else if (e.key === 'Escape') {
+        // Escape 取消编辑
+        e.preventDefault()
+        cancelEditing()
+      }
+      // 阻止事件冒泡，避免影响其他交互
+      e.stopPropagation()
+    },
+    [finishEditing, cancelEditing],
+  )
 
   function handleClick(e: PointerEvent) {
     e.preventDefault()
     e.stopPropagation()
 
-    const position = screenToFlowPosition({ x: e.clientX, y: e.clientY })
+    // 计算屏幕位置
+    const screenX = e.clientX
+    const screenY = e.clientY
 
-    setNodes((nodes) => [
-      ...nodes,
-      {
-        id: crypto.randomUUID(),
-        type: 'text',
-        position,
-        data: {
-          text: '新文本',
-          fontSize: 16,
-          fontWeight: 'normal' as const,
-          color: '#000000',
-          backgroundColor: 'transparent',
-          borderColor: 'transparent',
-          borderWidth: 0,
-          textAlign: 'left' as const,
-        },
-      },
-    ])
+    // 设置编辑状态和位置
+    setEditPosition({ x: screenX, y: screenY })
+    setEditText('')
+    setIsEditing(true)
   }
 
+  // 处理失去焦点
+  const handleBlur = useCallback(() => {
+    finishEditing()
+  }, [finishEditing])
+
   return (
-    <div
-      className="nopan nodrag pointer-events-auto absolute inset-0 z-[5] cursor-text"
-      onPointerDown={handleClick}
-    />
+    <>
+      {/* 点击区域 */}
+      {!isEditing && (
+        <div
+          className="nopan nodrag pointer-events-auto absolute inset-0 z-[5] cursor-text"
+          onPointerDown={handleClick}
+        />
+      )}
+
+      {/* 编辑中的 textarea */}
+      {isEditing && (
+        <div
+          className="pointer-events-none absolute inset-0 z-[10]"
+          style={{
+            pointerEvents: 'none',
+          }}
+        >
+          <textarea
+            ref={textareaRef}
+            value={editText}
+            onChange={(e) => setEditText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            className="pointer-events-auto absolute resize-none"
+            style={{
+              ...defaultTextStyle,
+              left: editPosition.x,
+              top: editPosition.y,
+              color: '#000000',
+            }}
+            placeholder=""
+          />
+        </div>
+      )}
+    </>
   )
 }
 
@@ -601,7 +720,8 @@ export default function TextFlow() {
             </button>
           </div>
           <div className="mt-2 text-xs text-gray-600">
-            Text Mode: 点击画布添加文本节点<br/>
+            Text Mode: 点击画布添加文本节点
+            <br />
             双击文本节点进行编辑 (Ctrl+Enter保存, Esc取消)
           </div>
         </Panel>
