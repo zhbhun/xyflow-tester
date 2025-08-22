@@ -99,6 +99,14 @@ export function Home() {
               text
             </Link>
           </li>
+          <li>
+            <Link
+              to="/node/flow"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              flow
+            </Link>
+          </li>
         </ul>
       </li>
     </ul>

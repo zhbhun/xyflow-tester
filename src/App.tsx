@@ -8,6 +8,7 @@ import RectangleFlow from './pages/node/rect'
 import EllipseFlow from './pages/node/ellipse'
 import PathFlow from './pages/node/path'
 import TextFlow from './pages/node/text'
+import FlowDemo from './pages/node/flow'
 import CrossBackground from './pages/background/cross'
 import DotsBackground from './pages/background/dots'
 import LinesBackground from './pages/background/lines'
@@ -24,6 +25,7 @@ function App() {
       <Route path="/node/ellipse" element={<EllipseFlow />} />
       <Route path="/node/path" element={<PathFlow />} />
       <Route path="/node/text" element={<TextFlow />} />
+      <Route path="/node/flow" element={<FlowDemo />} />
       <Route path="/background/cross" element={<CrossBackground />} />
       <Route path="/background/dots" element={<DotsBackground />} />
       <Route path="/background/lines" element={<LinesBackground />} />
