@@ -107,6 +107,14 @@ export function Home() {
               flow
             </Link>
           </li>
+          <li>
+            <Link
+              to="/node/group"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              group
+            </Link>
+          </li>
         </ul>
       </li>
     </ul>
